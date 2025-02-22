@@ -19,7 +19,7 @@ export const StockHeader: React.FC<StockHeaderProps> = () => {
         <div className="flex gap-2">
           <Button  className="flex items-center gap-2">
             <PlusCircle className="w-4 h-4" />
-              <Link href={'/addstock'}>เพิ่มสินค้าใหม่</Link>
+              <Link href={'/addstock/addstockNew'}>เพิ่มสินค้าใหม่</Link>
           </Button>
           <Button variant="outline" className="flex items-center gap-2">
             <RefreshCw className="w-4 h-4" />

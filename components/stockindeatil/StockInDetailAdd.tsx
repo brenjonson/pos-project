@@ -58,9 +58,19 @@ export default function StockInDetailAdd() {
     // บันทึกทั้งหมดลงฐานข้อมูล
     const handleSaveAll = async () => {
         try {
+            const formElement = document.querySelector('form') as HTMLFormElement;
             const formData = new FormData();
+            
+            // ตรวจสอบ empID จาก form element
+            const empID = formElement.querySelector('input[name="empID"]')?.value;
+            if (!empID) {
+                toast.error("กรุณาเลือกพนักงาน");
+                return;
+            }
+    
+            // ใส่ข้อมูลที่จำเป็นใน FormData
+            formData.append("empID", empID);
             formData.append("totalPrice", grandTotal.toString());
-            formData.append("empID", "1"); // ควรรับค่าจริงจาก session
             formData.append("items", JSON.stringify(items));
             
             await createStockInWithDetails(formData);
