@@ -46,11 +46,11 @@ export default function StockCard({ stock }: StockCardProps) {
                             <TableCell className="text-right">{stock.Quantity}</TableCell>
                             <TableCell>
                                 <div className={`px-2 py-1 rounded-full text-center text-sm 
-                        ${stock.Quantity <= stock.Quantity
+                        ${stock.Quantity <= 20
                                         ? 'bg-red-100 text-red-800'
                                         : 'bg-green-100 text-green-800'
                                     }`}>
-                                    {stock.Quantity <= stock.Quantity ? 'ต่ำกว่าขั้นต่ำ' : 'ปกติ'}
+                                    {stock.Quantity <= 20 ? 'ต่ำกว่าขั้นต่ำ' : 'ปกติ'}
                                 </div>
                             </TableCell>
                             <TableCell className="text-right">{stock.LastUpdated}</TableCell>

@@ -27,6 +27,7 @@ export function ComboboxIngredien() {
     const [open, setOpen] = React.useState(false)
     const [value, setValue] = React.useState("")
     const [selectedLabel, setSelectedLabel] = React.useState("") 
+    const [selectedStockID, setSelectedStockID] = React.useState("") // เพิ่ม state สำหรับเก็บ stockID
     const [ingredientNames, setIngredientNames] = useState([]); // เปลี่ยนชื่อให้ชัดเจนขึ้น
     const [isLoading, setIsLoading] = useState(true)
   
@@ -71,16 +72,16 @@ export function ComboboxIngredien() {
               className="w-[200px] justify-between"
             >
               {value && ingredientNames.length > 0
-                ? ingredientNames.find((item) => item.value === value)?.label || "เลือกอาหาร..."
-                : "เลือกอาหาร..."}
+                ? `${value} - ${ingredientNames.find((item) => item.value === value)?.label}` 
+                : "เลือกวัตถุดิบ..."}
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50"/>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[200px] p-0">
+          <PopoverContent className="w-[300px] p-0"> {/* เพิ่มความกว้างเป็น 300px */}
             <Command>
-              <CommandInput placeholder="ค้นหาอาหาร..." className="h-9"/>
+              <CommandInput placeholder="ค้นหาวัตถุดิบ..." className="h-9"/>
               <CommandList>
-                <CommandEmpty>ไม่พบรายการอาหาร</CommandEmpty>
+                <CommandEmpty>ไม่พบรายการวัตถุดิบ</CommandEmpty>
                 <CommandGroup>
                   {isLoading ? (
                     <CommandItem disabled>กำลังโหลด...</CommandItem>
@@ -93,10 +94,14 @@ export function ComboboxIngredien() {
                           setValue(currentValue === value ? "" : currentValue)
                           const selected = ingredientNames.find(i => i.value === currentValue)
                           setSelectedLabel(selected?.label || "")
+                          setSelectedStockID(selected?.value || "")
                           setOpen(false)
                         }}
                       >
-                        {item.label}
+                        <span className="flex gap-2">
+                          <span className="text-gray-500">#{item.value}</span>
+                          <span>{item.label}</span>
+                        </span>
                         <Check
                           className={cn(
                             "ml-auto h-4 w-4",
@@ -111,6 +116,11 @@ export function ComboboxIngredien() {
             </Command>
           </PopoverContent>
         </Popover>
+        <input 
+          type="hidden" 
+          name="stockID" 
+          value={selectedStockID}
+        />
         <input 
           type="hidden" 
           name="ingredientName" 

@@ -1,18 +1,13 @@
-/*
-  Warnings:
+-- CreateTable
+CREATE TABLE `Customer` (
+    `customerID` INTEGER NOT NULL AUTO_INCREMENT,
+    `firstName` VARCHAR(191) NOT NULL,
+    `lastName` VARCHAR(191) NOT NULL,
+    `customerPhone` VARCHAR(191) NOT NULL,
+    `cusCreatedAt` DATETIME(3) NOT NULL,
 
-  - You are about to drop the column `email` on the `Customer` table. All the data in the column will be lost.
-  - Added the required column `cusCreatedAt` to the `Customer` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `customerPhone` to the `Customer` table without a default value. This is not possible if the table is not empty.
-
-*/
--- DropIndex
-DROP INDEX `Customer_email_key` ON `Customer`;
-
--- AlterTable
-ALTER TABLE `Customer` DROP COLUMN `email`,
-    ADD COLUMN `cusCreatedAt` DATETIME(3) NOT NULL,
-    ADD COLUMN `customerPhone` VARCHAR(191) NOT NULL;
+    PRIMARY KEY (`customerID`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `Tables` (
@@ -138,13 +133,17 @@ CREATE TABLE `Stock` (
 
 -- CreateTable
 CREATE TABLE `TimeScription` (
+    `TimeScriptionID` INTEGER NOT NULL AUTO_INCREMENT,
     `Employee_empID` INTEGER NOT NULL,
     `Stock_stockID` INTEGER NOT NULL,
     `tsCreatedAt` DATETIME(3) NULL,
     `Unit` VARCHAR(191) NULL,
     `Quantity` DOUBLE NULL,
+    `note` VARCHAR(191) NULL,
 
-    PRIMARY KEY (`Employee_empID`, `Stock_stockID`)
+    INDEX `TimeScription_Employee_empID_idx`(`Employee_empID`),
+    INDEX `TimeScription_Stock_stockID_idx`(`Stock_stockID`),
+    PRIMARY KEY (`TimeScriptionID`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
@@ -170,6 +169,31 @@ CREATE TABLE `Stock_In_Detail` (
     `Stock_stockID` INTEGER NOT NULL,
 
     PRIMARY KEY (`stockInDetailID`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `StockOut` (
+    `stockOutID` INTEGER NOT NULL AUTO_INCREMENT,
+    `stockOutDate` DATETIME(3) NOT NULL,
+    `totalPrice` DOUBLE NOT NULL,
+    `note` VARCHAR(191) NULL,
+    `empID` INTEGER NOT NULL,
+
+    PRIMARY KEY (`stockOutID`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `StockOutDetail` (
+    `stockOutDetailID` INTEGER NOT NULL AUTO_INCREMENT,
+    `ingredientName` VARCHAR(191) NOT NULL,
+    `quantity` DOUBLE NOT NULL,
+    `unit` VARCHAR(191) NOT NULL,
+    `pricePerUnit` DOUBLE NOT NULL,
+    `totalPrice` DOUBLE NOT NULL,
+    `stockOutID` INTEGER NOT NULL,
+    `stockID` INTEGER NOT NULL,
+
+    PRIMARY KEY (`stockOutDetailID`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey
@@ -213,3 +237,12 @@ ALTER TABLE `Stock_In_Detail` ADD CONSTRAINT `Stock_In_Detail_Stock_In_stockInID
 
 -- AddForeignKey
 ALTER TABLE `Stock_In_Detail` ADD CONSTRAINT `Stock_In_Detail_Stock_stockID_fkey` FOREIGN KEY (`Stock_stockID`) REFERENCES `Stock`(`stockID`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `StockOut` ADD CONSTRAINT `StockOut_empID_fkey` FOREIGN KEY (`empID`) REFERENCES `Employee`(`empID`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `StockOutDetail` ADD CONSTRAINT `StockOutDetail_stockOutID_fkey` FOREIGN KEY (`stockOutID`) REFERENCES `StockOut`(`stockOutID`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `StockOutDetail` ADD CONSTRAINT `StockOutDetail_stockID_fkey` FOREIGN KEY (`stockID`) REFERENCES `Stock`(`stockID`) ON DELETE RESTRICT ON UPDATE CASCADE;

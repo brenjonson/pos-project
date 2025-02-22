@@ -22,3 +22,41 @@ export interface stock_InProps {
     note?: string;
 }
 
+// types.ts
+export interface StockInDetail {
+    stockID: number;
+    ingredientName: string;
+    quantity: number;
+    unit: string;
+    pricePerUnit: number;
+    totalPrice: number;
+  }
+
+
+  export interface StockInFormData {
+    stockInID: string;
+    ingredientName: string;
+    quantity: string;
+    unit: string;
+    pricePerUnit: string;
+    totalPrice: string;
+    employee: string;
+    note: string;
+  }
+
+  // types.ts
+export interface StockInItem {
+    stockID: number;
+    id: string;
+    ingredientName: string;
+    quantity: string;
+    unit: string;
+    pricePerUnit: string;
+    totalPrice: string;
+  }
+
+
+  
+
+
+

@@ -6,12 +6,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Link from "next/link";
 import { addStockIn } from "@/actions/actions";
-import prisma from "@/utils/db";
-import { title } from "process";
 import { useState } from "react";
 import ComboBoxCus from "../combobox/ComboBoxCus";
 
-export default function StockInAdd() {
+export default function ListDetail() {
     const [selectedUnit, setSelectedUnit] = useState('');
 
     // ใช้ onValueChange แทน onChange
@@ -19,19 +17,22 @@ export default function StockInAdd() {
         setSelectedUnit(value); // กำหนดค่าที่เลือกใน state
     };
 
-
-
     return (
         <div>
             <form className="space-y-6" action={addStockIn}>
 
-
-                {/* วันที่นำเข้า */}
+                {/* รหัสการรับสินค่า StockInID */}
                 <div className="space-y-2">
-                    <Label htmlFor="Datetime">วันที่และเวลานำเข้า</Label>
-                    <Input id="Datetime" placeholder="วันที่และเวลานำเข้า" name="stockinDatetime" type="date"/>
+                    <Label htmlFor="Datetime">รหัสการรับสินค้า</Label>
+                    <Input id="stockInID" placeholder="StockID" name="stockInID" type="number"/>
                 </div>
 
+                {/* พนักงานนำเข้า */}
+                <div className="space-y-2">
+                    <ComboBoxCus/>
+                </div>
+
+                
                 {/* ราคาทั้งหมด */}
                 <div className="space-y-2">
                     <Label htmlFor="totalPrice">ราคาทั้งหมด (บาท)</Label>
@@ -44,15 +45,11 @@ export default function StockInAdd() {
                     />
                 </div>
 
-                {/* พนักงานนำเข้า */}
+                
                 {/* <div className="space-y-2">
                     <Label htmlFor="empID">พนักงานที่นำเข้า</Label>
                     <Input id="empID" placeholder="รหัสพนักงาน" name="empID" type="number"/>
                 </div> */}
-                
-                <div className="space-y-2">
-                    <ComboBoxCus/>
-                </div>
                 
 
                 <div className="space-y-2">

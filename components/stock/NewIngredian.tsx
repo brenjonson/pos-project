@@ -8,7 +8,7 @@ import Link from "next/link";
 import { addStock } from "@/actions/actions";
 import { useState } from "react";
 
-import { ComboboxDemo } from "../combobox/ComboBoxIngredien";
+import { ComboboxIngredien } from "../combobox/ComboBoxIngredien";
 
 export default function NewIngredian() {
     const [selectedUnit, setSelectedUnit] = useState('');

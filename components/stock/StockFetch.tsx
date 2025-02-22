@@ -9,6 +9,7 @@ export default function StockFetch() {
     const loadStocks = async () => {
       const res = await fetch("/api/stock"); //เรียก API ให้ไป fetch ข้อมูลที่ api
       const data = await res.json();
+      console.log(data);
       setStocks(data); // อัปเดต state หลังจาก render เสร็จ
     };
 

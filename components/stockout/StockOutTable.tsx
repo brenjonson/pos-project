@@ -34,7 +34,7 @@ export default function StockOutTable({ data }) {
                         <TableRow key={item.stockOutID} className="hover:bg-gray-50">
                             {/* รหัสนำออก */}
                             <TableCell className="text-center font-medium"> 
-                                {String(item.stockOutID).padStart(4, '0')}
+                                {String(item.TimeScriptionID).padStart(4, '0')}
                             </TableCell>
                             {/* วันที่และเวลา */}
                             <TableCell>
