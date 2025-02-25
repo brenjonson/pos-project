@@ -2,7 +2,9 @@
 import { Calendar, User } from 'lucide-react';
 import { formatDateTime, formatPrice } from '@/lib/utils';
 import EmployeeCell from './EmployeeCell';
-
+import { Button } from "@/components/ui/button"
+import { Eye } from "lucide-react"
+import Link from "next/link"
 
 export default function StockInTable({ data }) {
     console.log('Data received in table:', data); // เพิ่ม log ตรงนี้
@@ -26,6 +28,7 @@ export default function StockInTable({ data }) {
                         <TableHead className="text-right">มูลค่ารวม</TableHead>
                         <TableHead>พนักงาน</TableHead>
                         <TableHead>หมายเหตุ</TableHead>
+                        <TableHead className="text-center">ดูรายละเอียด</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -53,6 +56,21 @@ export default function StockInTable({ data }) {
                             </TableCell>
                             <TableCell className="text-gray-600">
                                 {item.note || '-'}
+                            </TableCell>
+                            <TableCell className="text-center">
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    asChild
+                                >
+                                    <Link 
+                                        href={`/stockin/${item.stockInID}`}
+                                        className="flex items-center gap-2"
+                                    >
+                                        <Eye className="w-4 h-4" />
+                                        <span>ดูรายละเอียด</span>
+                                    </Link>
+                                </Button>
                             </TableCell>
                         </TableRow>
                     ))}

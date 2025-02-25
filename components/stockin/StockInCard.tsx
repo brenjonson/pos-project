@@ -1,7 +1,7 @@
 ﻿import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Calendar } from 'lucide-react';
 import StockInStats from './StockInStats';
-import StockInTable from './StockIntable';
+import StockInTable from './StockInTable';
 
 
 export default function StockInCard({ stockIns }) {

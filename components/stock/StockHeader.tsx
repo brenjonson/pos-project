@@ -4,7 +4,7 @@ import { CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, RefreshCw } from "lucide-react";
 import Link from 'next/link';
-Link
+import { useRouter } from 'next/navigation';
 
 interface StockHeaderProps {
   onAddNew: () => void;
@@ -12,6 +12,13 @@ interface StockHeaderProps {
 }
 
 export const StockHeader: React.FC<StockHeaderProps> = () => {
+  const router = useRouter();
+
+  const handleRefresh = () => {
+    router.refresh();
+    router.push('/stock');
+  };
+
   return (
     <CardHeader>
       <div className="flex justify-between items-center">
@@ -21,7 +28,11 @@ export const StockHeader: React.FC<StockHeaderProps> = () => {
             <PlusCircle className="w-4 h-4" />
               <Link href={'/addstock/addstockNew'}>เพิ่มสินค้าใหม่</Link>
           </Button>
-          <Button variant="outline" className="flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            className="flex items-center gap-2"
+            onClick={handleRefresh}
+          >
             <RefreshCw className="w-4 h-4" />
             รีเฟรช
           </Button>

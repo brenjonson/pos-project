@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `Stock` ADD COLUMN `minQuantity` DOUBLE NOT NULL DEFAULT 0;

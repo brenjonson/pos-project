@@ -135,7 +135,11 @@ model Stock {
   costPrice      Float
   Unit           String
   Quantity       Float   @default(0)
+  minQuantity    Float  @default(0)
   LastUpdated    DateTime
+  imageUrl     String?
+  isDeleted      Boolean @default(false)  // เพิ่มฟิลด์ใหม่
+  deletedAt      DateTime?  // เพิ่มฟิลด์เก็บเวลาที่ลบ
   timeScription  TimeScription[]
   stockInDetail  Stock_In_Detail[]
 

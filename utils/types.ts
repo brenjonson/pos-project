@@ -55,7 +55,21 @@ export interface StockInItem {
     totalPrice: string;
   }
 
-
+  
+export interface StockCardProps {
+    stock: {
+      stockID: number;
+      ingredientName: string;
+      Quantity: number;
+      Unit: string;
+      costPrice: number;
+      LastUpdated: any;
+      minQuantity?: number; // เพิ่มฟิลด์จำนวนขั้นต่ำ
+      imageUrl?: string; // เพิ่มฟิลด์สำหรับ URL รูปภาพ
+    };
+    onEdit?: (stockID: number) => void;
+    onDelete?: (stockID: number) => void;
+  }
   
 
 

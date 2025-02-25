@@ -11,7 +11,8 @@ export const addStock = async (formData: FormData) => {
   const quantity = parseFloat(formData.get("quantity")?.toString() || "0");
   const unit = formData.get("unit")?.toString();
   const price = parseFloat(formData.get("price")?.toString() || "0.00");
-  const category = formData.get("category")?.toString();
+  const minQuantity = parseFloat(formData.get("minQuantity")?.toString() || "0");
+  const imageUrl = formData.get("imageUrl")?.toString();  // เพิ่มการรับค่า imageUrl
 
   if (!ingredientName) {
     throw new Error("รับชื่อวัตถุดิบไม่ได้");
@@ -35,6 +36,7 @@ export const addStock = async (formData: FormData) => {
       },
       data: {
         Quantity: existingStock.Quantity + quantity, // เพิ่มจำนวนสินค้า
+        minQuantity: minQuantity,
         LastUpdated: new Date(), // อัปเดตเวลาล่าสุด
       },
     });
@@ -47,6 +49,8 @@ export const addStock = async (formData: FormData) => {
         costPrice: price,
         Unit: unit,
         Quantity: quantity, // จำนวนสินค้าที่เพิ่ม
+        minQuantity: minQuantity,
+        imageUrl: imageUrl || null,
         LastUpdated: new Date(), // เวลาที่เพิ่มสินค้า
       },
     });
@@ -110,8 +114,9 @@ export const createStockInWithDetails = async (formData: FormData) => {
               where: { stockID: item.stockID },
               data: {
                   Quantity: {
-                      increment: parseFloat(item.quantity)
+                      increment: parseFloat(item.quantity),
                   },
+                  costPrice: parseFloat(item.pricePerUnit),
                   LastUpdated: new Date(),
               },
           });
@@ -196,12 +201,17 @@ export const outStock = async (formdata: FormData) => {
 //fetch ข้อมูลจากฐานข้อมูล
 export const fetchStock = async () => {
   try {
-    const stock = await prisma.stock.findMany();
-    return stock;
-  } catch (error) {
-    console.error("Error fetching stock:", error);
-    return [];
-  }
+    const stocks = await prisma.stock.findMany({
+      where: {
+          isDeleted: false // แสดงเฉพาะรายการที่ยังไม่ถูกลบ
+      },
+
+  });
+  return stocks;
+} catch (error) {
+  console.error('Fetch stock error:', error);
+  throw error;
+}
 };
 
 
@@ -246,8 +256,110 @@ export const fetchTimeScription = async () => {
 };
 
 
+export const fetchStockInDetails = async (stockInID: number) => {
+  try {
+      // ดึงข้อมูลจาก Stock_In และ Stock_In_Detail พร้อมกัน
+      const stockInData = await prisma.stock_In.findUnique({
+          where: { 
+              stockInID 
+          },
+          include: {
+              employee: true,
+              stockInDetail: {
+                include: {
+                    stock: true // เพิ่ม relation กับตาราง Stock
+                }
+            }
+          }
+      });
+
+      if (!stockInData) {
+          throw new Error("ไม่พบข้อมูลการนำเข้า");
+      }
+
+      // จัดรูปแบบข้อมูลที่จะส่งกลับ
+      return {
+          stockIn: {
+              stockInID: stockInData.stockInID,
+              stockInDateTime: stockInData.stockInDateTime,
+              totalPrice: stockInData.totalPrice,
+              employee: stockInData.employee,
+              note: stockInData.note
+          },
+          details: stockInData.stockInDetail.map(detail => ({
+              stockInDetailID: detail.stockInDetailID,
+              ingredientName: detail.ingredientName,
+              quantity: detail.quantity,
+              unit: detail.unit,
+              pricePerUnit: detail.pricePerUnit,
+              totalPrice: detail.totalPrice,
+              stock: detail.stock
+          }))
+      };
+  } catch (error) {
+      console.error("Error fetching stock in details:", error);
+      throw error;
+  }
+};
 
 
+// ฟังก์ชันสำหรับแก้ไข stock
+export async function updateStock(stockID: number, data: {
+  ingredientName?: string;
+  costPrice?: number;
+  Unit?: string;
+  minQuantity?: number;
+  Quantity?: number;
+}) {
+  try {
+    // ตรวจสอบข้อมูลก่อนอัพเดท
+      if (data.Quantity !== undefined && data.Quantity < 0) {
+        throw new Error("จำนวนคงเหลือต้องไม่น้อยกว่า 0");
+      }
+      const updated = await prisma.stock.update({
+          where: { stockID },
+          data: {
+              ...data,
+              LastUpdated: new Date()
+          }
+      });
+      return updated;
+  } catch (error) {
+      console.error('Update stock error:', error);
+      throw error;
+  }
+}
 
+// เพิ่มฟังก์ชันสำหรับ Soft Delete
+export const deleteStock = async (stockID: number) => {
+  try {
+      // ตรวจสอบว่ามีการใช้งานใน Stock_In_Detail หรือ StockOutDetail หรือไม่
+      const stockInUse = await prisma.stock_In_Detail.findFirst({
+          where: { Stock_stockID: stockID }
+      });
 
+      const stockOutUse = await prisma.stockOutDetail.findFirst({
+          where: { stockID }
+      });
+
+      if (stockInUse || stockOutUse) {
+          throw new Error("ไม่สามารถลบได้เนื่องจากมีการใช้งานในประวัติการนำเข้าหรือเบิกออก");
+      }
+
+      // ทำ Soft Delete
+      const updatedStock = await prisma.stock.update({
+          where: { stockID },
+          data: {
+              isDeleted: true,
+              deletedAt: new Date(),
+              LastUpdated: new Date()
+          }
+      });
+
+      return { success: true, data: updatedStock };
+  } catch (error) {
+      console.error('Delete stock error:', error);
+      throw error;
+  }
+};
 
