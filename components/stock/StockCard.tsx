@@ -70,24 +70,14 @@ export default function StockCard({ stock, onEdit, onDelete }: StockCardProps) {
                 costPrice: parseFloat(formData.get('costPrice') as string),
                 Unit: formData.get('unit') as string,
                 minQuantity: parseFloat(formData.get('minQuantity') as string),
-                Quantity: parseFloat(formData.get('quantity') as string),  // เพิ่มการรับค่า quantity
             };
-
-            // ตรวจสอบความถูกต้องของข้อมูล
-            if (isNaN(data.Quantity) || data.Quantity < 0) {
-                throw new Error("จำนวนคงเหลือไม่ถูกต้อง");
-            }
-
+            
             await updateStock(stock.stockID, data);
             toast.success("แก้ไขข้อมูลสำเร็จ");
             router.refresh();
             setIsEditDialogOpen(false);
         } catch (error) {
-            if (error instanceof Error) {
-                toast.error(error.message || "เกิดข้อผิดพลาดในการแก้ไขข้อมูล");
-            } else {
-                toast.error("เกิดข้อผิดพลาดในการแก้ไขข้อมูล");
-            }
+            toast.error("เกิดข้อผิดพลาดในการแก้ไขข้อมูล");
         } finally {
             setIsLoading(false);
         }

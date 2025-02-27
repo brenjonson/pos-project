@@ -8,7 +8,6 @@ import { Input } from '../ui/input';
 import { Button } from '../ui/button';
 import Link from 'next/link';
 import ComboBoxCus from '../combobox/ComboBoxCus';
-import { addStockInDetail } from '@/actions/actions';
 import { createStockInWithDetails } from '@/actions/actions';
 import { ComboboxIngredien } from '../combobox/ComboBoxIngredien';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -24,6 +23,7 @@ export default function StockInDetailAdd() {
     const [totalPrice, setTotalPrice] = useState<number>(0);
     const [selectedUnit, setSelectedUnit] = useState('');
     const [grandTotal, setGrandTotal] = useState<number>(0);
+    const [note, setNote] = useState<string>('');
 
     // คำนวณราคารวมต่อรายการ
     useEffect(() => {
@@ -72,7 +72,8 @@ export default function StockInDetailAdd() {
             formData.append("empID", empID);
             formData.append("totalPrice", grandTotal.toString());
             formData.append("items", JSON.stringify(items));
-            
+            formData.append("note", note); // เพิ่ม note
+
             await createStockInWithDetails(formData);
             toast.success("บันทึกข้อมูลสำเร็จ");
             router.push('/stock');
@@ -162,6 +163,17 @@ export default function StockInDetailAdd() {
 
                     <div>
                         <ComboBoxCus />
+                    </div>
+                    <div>
+                    <Label htmlFor="note">หมายเหตุ</Label>
+                    <textarea
+                        id="note"
+                        name="note"
+                        value={note}
+                        onChange={(e) => setNote(e.target.value)}
+                        className="w-full min-h-[100px] p-2 border rounded-md"
+                        placeholder="เพิ่มหมายเหตุ (ถ้ามี)"
+                    />
                     </div>
                 </div>
 

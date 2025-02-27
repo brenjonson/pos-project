@@ -76,7 +76,7 @@ export const createStockInWithDetails = async (formData: FormData) => {
   try {
       const empID = parseInt(formData.get("empID") as string);
       const totalPrice = parseFloat(formData.get("totalPrice") as string);
-
+      const note = formData.get("note") as string || ""; // รับค่า note
 
       if (!empID) {
           throw new Error("กรุณาเลือกพนักงาน");
@@ -88,7 +88,7 @@ export const createStockInWithDetails = async (formData: FormData) => {
               stockInDateTime: new Date(),
               totalPrice: totalPrice,
               Employee_empID: empID,
-              note: "",
+              note: note, 
           },
       });
 
@@ -309,13 +309,8 @@ export async function updateStock(stockID: number, data: {
   costPrice?: number;
   Unit?: string;
   minQuantity?: number;
-  Quantity?: number;
 }) {
   try {
-    // ตรวจสอบข้อมูลก่อนอัพเดท
-      if (data.Quantity !== undefined && data.Quantity < 0) {
-        throw new Error("จำนวนคงเหลือต้องไม่น้อยกว่า 0");
-      }
       const updated = await prisma.stock.update({
           where: { stockID },
           data: {

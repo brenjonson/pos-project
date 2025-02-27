@@ -14,7 +14,7 @@ interface EditStockDialogProps {
 }
 
 export function EditStockDialog({ stock, isOpen, isLoading, onOpenChange, onSubmit }: EditStockDialogProps) {
-    
+
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogContent>
@@ -28,17 +28,6 @@ export function EditStockDialog({ stock, isOpen, isLoading, onOpenChange, onSubm
                             id="ingredientName"
                             name="ingredientName"
                             defaultValue={stock.ingredientName}
-                            required
-                        />
-                    </div>
-
-                    <div>
-                        <Label htmlFor="quantity">จำนวน</Label>
-                        <Input
-                            id="quantity"
-                            name="quantity"
-                            type="number"
-                            defaultValue={stock.Quantity}
                             required
                         />
                     </div>

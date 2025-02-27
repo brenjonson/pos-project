@@ -71,6 +71,7 @@ export interface StockCardProps {
     onDelete?: (stockID: number) => void;
   }
   
+  
 
 
 
