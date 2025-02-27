@@ -54,6 +54,7 @@ model Employee {
   TimeScription TimeScription[]
 
   StockOut StockOut[]
+  canceledStockIns Stock_In[] @relation("CanceledByEmployee")
 }
 
 model Orders {
@@ -167,12 +168,15 @@ model Stock_In {
   stockInID       Int      @id @default(autoincrement())
   stockInDateTime DateTime
   totalPrice      Float
-  
-  employee        Employee @relation(fields: [Employee_empID], references: [empID])
   Employee_empID Int
-  
   note String?
-  
+  isCanceled     Boolean  @default(false)    // เพิ่มฟิลด์สถานะการยกเลิก
+  canceledAt     DateTime?                   // เพิ่มเวลาที่ยกเลิก
+  cancelNote     String?                     // เพิ่มหมายเหตุการยกเลิก
+  canceledBy     Int?                  // เพิ่มรหัสพนักงานที่ยกเลิก
+
+  canceledByEmployee Employee? @relation("CanceledByEmployee", fields: [canceledBy], references: [empID])
+  employee        Employee @relation(fields: [Employee_empID], references: [empID])
   stockInDetail   Stock_In_Detail[]
 
 }

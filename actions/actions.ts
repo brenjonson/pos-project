@@ -218,11 +218,15 @@ export const fetchStock = async () => {
 export const fetchStockIn = async () => {
   try {
     const stock_In = await prisma.stock_In.findMany({
+      where: {
+        isCanceled: false // เพิ่มเงื่อนไขให้แสดงเฉพาะรายการที่ยังไม่ถูกยกเลิก
+      },
       include: {
-        employee: true // คำสั่ง join กับตาราง employee
-      }
+        employee: true,
+        canceledByEmployee: true // เพิ่ม relation กับพนักงานที่ยกเลิก
+      },
     });
-    return stock_In
+    return stock_In;
   } catch (error) {
     console.error("Error fetching stock:", error);
     return [];
@@ -354,6 +358,80 @@ export const deleteStock = async (stockID: number) => {
       return { success: true, data: updatedStock };
   } catch (error) {
       console.error('Delete stock error:', error);
+      throw error;
+  }
+};
+
+
+export const cancelStockIn = async (
+  stockInID: number,
+  canceledByEmpID: number,
+  cancelNote: string
+) => {
+  try {
+      // เริ่ม transaction
+      return await prisma.$transaction(async (tx) => {
+          // ดึงข้อมูล StockIn และรายละเอียด
+          const stockIn = await tx.stock_In.findUnique({
+              where: { stockInID },
+              include: {
+                  stockInDetail: {
+                      include: {
+                          stock: true // เพิ่มการดึงข้อมูล stock
+                      }
+                  }
+              }
+          });
+
+          if (!stockIn) {
+              throw new Error("ไม่พบรายการนำเข้า");
+          }
+
+          if (stockIn.isCanceled) {
+              throw new Error("รายการนี้ถูกยกเลิกไปแล้ว");
+          }
+
+          // ตรวจสอบและลดจำนวนสินค้าในสต็อก
+          for (const detail of stockIn.stockInDetail) {
+              const stock = detail.stock;
+              if (!stock) {
+                  throw new Error(`ไม่พบข้อมูลสินค้ารหัส ${detail.Stock_stockID}`);
+              }
+
+              // ตรวจสอบว่าจำนวนคงเหลือพอที่จะลดหรือไม่
+              if (stock.Quantity < detail.quantity) {
+                  throw new Error(
+                      `ไม่สามารถยกเลิกได้เนื่องจากจำนวนคงเหลือของ ${stock.ingredientName} ไม่เพียงพอ`
+                  );
+              }
+
+              // ลดจำนวนสินค้าในสต็อก
+              await tx.stock.update({
+                  where: { stockID: detail.Stock_stockID },
+                  data: {
+                      Quantity: {
+                          decrement: detail.quantity
+                      },
+                      LastUpdated: new Date()
+                  }
+              });
+          }
+
+          // อัพเดทสถานะการยกเลิกใน StockIn
+          const updatedStockIn = await tx.stock_In.update({
+              where: { stockInID },
+              data: {
+                  isCanceled: true,
+                  canceledAt: new Date(),
+                  cancelNote: cancelNote,
+                  canceledBy: canceledByEmpID
+              }
+          });
+
+          return updatedStockIn;
+      });
+  } catch (error) {
+      console.error("Error canceling stock in:", error);
       throw error;
   }
 };

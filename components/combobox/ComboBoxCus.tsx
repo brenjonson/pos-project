@@ -18,6 +18,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
+
 export default function ComboBoxCus() {
   const [open, setOpen] = React.useState(false)
   const [value, setValue] = React.useState("")
@@ -48,6 +49,8 @@ export default function ComboBoxCus() {
 
     loadCustomers()
   }, [])
+
+
 
   return (
     <div className="flex flex-col gap-2">
