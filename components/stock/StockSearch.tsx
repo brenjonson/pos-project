@@ -1,41 +1,44 @@
 ﻿// components/stock/StockSearch.tsx
-'use client'
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useDebouncedCallback } from 'use-debounce'
+import { useSearchParams, usePathname, useRouter } from 'next/navigation';
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
 
-interface StockSearchProps {
-  searchTerm: string;
-  onSearch: (value: string) => void;
-}
-
-export const StockSearch: React.FC<StockSearchProps> = () => {
-  const searchParams = useSearchParams()
-  const { replace } = useRouter()
-  const [search,setSearch] = useState(searchParams.get('stock')?.toString() || '')
+export const StockSearch: React.FC = () => {
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const { replace } = useRouter();
+  const [inputValue, setInputValue] = useState(searchParams.get('stock') || '');
   
-  const handleSearch = useDebouncedCallback((value:string)=>{
-    const params = new URLSearchParams(searchParams)
-    if(value){
-      params.set('stock',value)
-    }else{
-      params.delete('stock')
-    }
-    replace(`/stock?${params.toString()}`)
+  // อัพเดต input value เมื่อ URL เปลี่ยน
+  useEffect(() => {
+    setInputValue(searchParams.get('stock') || '');
+  }, [searchParams]);
 
-  },500);
+  // การจัดการค้นหาด้วย debounce (หน่วงเวลาค้นหาเพื่อลดการ request)
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      const params = new URLSearchParams(searchParams);
+      if (inputValue) {
+        params.set('stock', inputValue);
+      } else {
+        params.delete('stock');
+      }
+      replace(`${pathname}?${params.toString()}`);
+    }, 300); // หน่วงเวลา 500ms
 
+    return () => clearTimeout(timeout);
+  }, [inputValue, pathname, replace, searchParams]);
 
-  console.log(searchParams.get('stock'))
-
-  useEffect(()=>{
-    //code body
-    if(!searchParams.get('stock')){
-      setSearch('')
-    }
-  },[searchParams.get('stock')])
+  // ล้างการค้นหา
+  const clearSearch = () => {
+    setInputValue('');
+    const params = new URLSearchParams(searchParams);
+    params.delete('stock');
+    replace(`${pathname}?${params.toString()}`);
+  };
 
   return (
     <div className="flex items-center gap-4 mb-6">
@@ -43,13 +46,20 @@ export const StockSearch: React.FC<StockSearchProps> = () => {
         <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
         <Input
           placeholder="ค้นหาสินค้า..."
-          className="pl-8"
-         onChange={(e)=>{
-            setSearch(e.target.value)
-            handleSearch(e.target.value)
-         }} 
-         value={search}
+          className="pl-8 pr-10"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
         />
+        {inputValue && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute right-1 top-1 h-6 w-6"
+            onClick={clearSearch}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        )}
       </div>
     </div>
   );

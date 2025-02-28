@@ -1,45 +1,39 @@
-﻿// components/stock/StockFetch.tsx
-"use client";
-import { useEffect, useState } from "react"; // เอาไว้ใช้ส่งข้อมูล API
+﻿"use client";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import StockList from "./StockList";
 
-export default function StockFetch({ stock }: { stock?: string }) {
+export default function StockFetch() {
   const [stocks, setStocks] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-
+  const [loading, setLoading] = useState(false);
+  const searchParams = useSearchParams();
+  const searchTerm = searchParams.get('stock') || '';
+  
   useEffect(() => {
     const loadStocks = async () => {
+      setLoading(true);
       try {
-        setIsLoading(true);
-        console.log('Search term in component:', stock);
-
-        const url = stock 
-          ? `/api/stock?stock=${encodeURIComponent(stock)}`
-          : "/api/stock"; // ถ้าไม่มี stock ส่งค่าเป็น /api/stock
-
-        console.log("Fetching URL:", url);
-        const res = await fetch(url);
+        // ส่งคำค้นหาไปยัง API โดยตรง
+        const res = await fetch(`/api/stock?search=${encodeURIComponent(searchTerm)}`);
         const data = await res.json();
-
-        console.log('Received data:', data);
         setStocks(data);
       } catch (error) {
-        console.error("Error loading stocks:", error);
+        console.error("Error fetching stocks:", error);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
     loadStocks();
-  }, [stock]);
-
-  if (isLoading) {
-    return <div>กำลังโหลด...</div>;
-  }
+  }, [searchTerm]); // ทำการดึงข้อมูลใหม่เมื่อคำค้นหาเปลี่ยน
 
   return (
     <div>
-      <StockList stocks={stocks} />
+      {loading ? (
+        <div className="text-center py-4">กำลังโหลดข้อมูล...</div>
+      ) : (
+        <StockList stocks={stocks} />
+      )}
     </div>
   );
 }
