@@ -16,7 +16,7 @@ import { cancelStockIn } from '@/actions/actions';
 import ComboBoxCus from '../combobox/ComboBoxCus';
 
 interface ComboBoxCusProps {
-  onSelect: (value: string) => void;
+    onSelect: (value: string) => void;
 }
 
 export default function StockInTable({ data }) {
@@ -24,7 +24,7 @@ export default function StockInTable({ data }) {
     const router = useRouter();
     const [selectedStockIn, setSelectedStockIn] = useState(null);
     const [cancelNote, setCancelNote] = useState('');
-    const [cancelEmpID, setCancelEmpID] = useState(''); 
+    const [cancelEmpID, setCancelEmpID] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
     const handleConfirmCancel = async () => {
@@ -33,7 +33,7 @@ export default function StockInTable({ data }) {
         try {
             setIsLoading(true);
             await cancelStockIn(
-                selectedStockIn.stockInID, 
+                selectedStockIn.stockInID,
                 parseInt(cancelEmpID), // แปลงเป็นตัวเลข
                 cancelNote
             );
@@ -130,7 +130,7 @@ export default function StockInTable({ data }) {
                     ))}
                 </TableBody>
             </Table>
-            
+
             <Dialog open={!!selectedStockIn} onOpenChange={(open) => !open && setSelectedStockIn(null)}>
                 <DialogContent>
                     <DialogHeader>
@@ -146,7 +146,8 @@ export default function StockInTable({ data }) {
                                 placeholder="ระบุเหตุผลการยกเลิก"
                                 required
                             />
-                            <ComboBoxCus/>
+                            <Label>พนักงานที่ทำรายการยกเลิก</Label>
+                            <ComboBoxCus onSelect={(value) => setCancelEmpID(value)} />
                         </div>
                     </div>
                     <DialogFooter>

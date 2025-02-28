@@ -199,21 +199,54 @@ export const outStock = async (formdata: FormData) => {
 
 
 //fetch ข้อมูลจากฐานข้อมูล
-export const fetchStock = async () => {
+export const fetchStock = async (search?: string) => {
   try {
+    console.log('Search term received:', search); // เพิ่ม logging
+
+    // ตรวจสอบค่าของ search ก่อนใช้งาน
+    const whereClause = {
+      AND: [
+        { isDeleted: false },
+        search && search.trim() ? { // ตรวจสอบว่า search มีค่าและไม่ว่าง
+          OR: [
+            { 
+              ingredientName: { 
+                contains: search.trim(), // เพิ่ม trim() เพื่อลบช่องว่าง
+                mode: 'insensitive'
+              }
+            },
+            {
+              ingredientName: {
+                startsWith: search.trim(),
+                mode: 'insensitive'
+              }
+            }
+          ]
+        } : {} // ถ้าไม่มีค่า search ให้ส่ง {} แทน
+      ]
+    };
+
     const stocks = await prisma.stock.findMany({
-      where: {
-          isDeleted: false // แสดงเฉพาะรายการที่ยังไม่ถูกลบ
-      },
+      where: whereClause,
+      select: { // เลือกเฉพาะฟิลด์ที่ต้องการ
+        stockID: true,
+        ingredientName: true,
+        Quantity: true,
+        Unit: true,
+        costPrice: true,
+        minQuantity: true,
+        imageUrl: true,
+        LastUpdated: true,
+        isDeleted: true
+      }
+    });
 
-  });
-  return stocks;
-} catch (error) {
-  console.error('Fetch stock error:', error);
-  throw error;
-}
+    return stocks || [];
+  } catch (error) {
+    console.error('Fetch stock error:', error);
+    throw error;
+  }
 };
-
 
 export const fetchStockIn = async () => {
   try {
@@ -232,6 +265,7 @@ export const fetchStockIn = async () => {
     return [];
   }
 };
+
 
 //ดึงข้อมูลพนักงาน
 export const fetchEmployee = async () => {

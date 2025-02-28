@@ -18,8 +18,12 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
+// เพิ่ม Props interface สำหรับ ComboBoxCus
+interface ComboBoxCusProps {
+  onSelect?: (value: string) => void;
+}
 
-export default function ComboBoxCus() {
+export default function ComboBoxCus({ onSelect }: ComboBoxCusProps) {
   const [open, setOpen] = React.useState(false)
   const [value, setValue] = React.useState("")
   const [selectedLabel, setSelectedLabel] = React.useState("")
@@ -50,7 +54,12 @@ export default function ComboBoxCus() {
     loadCustomers()
   }, [])
 
-
+  // เมื่อ value มีการเปลี่ยนแปลง ส่งค่าไปยัง parent component
+  React.useEffect(() => {
+    if (onSelect && value) {
+      onSelect(value);
+    }
+  }, [value, onSelect]);
 
   return (
     <div className="flex flex-col gap-2">
